@@ -1,128 +1,151 @@
-import { Star } from 'lucide-react';
+import React, { useState } from 'react';
 
-const featuredBooks = [
-  {
-    id: 1,
-    title: 'Cálculo I - Stewart',
-    course: 'Engenharia',
-    price: 'R$ 80,00',
-    rating: 5,
-    seller: {
-      name: 'João Silva',
-      avatar: 'JS',
-    },
-  },
-  {
-    id: 2,
-    title: 'Anatomia Humana - Netter',
-    course: 'Medicina',
-    price: 'TROCA',
-    rating: 5,
-    seller: {
-      name: 'Maria Santos',
-      avatar: 'MS',
-    },
-  },
-  {
-    id: 3,
-    title: 'Direito Constitucional',
-    course: 'Direito',
-    price: 'DOAÇÃO',
-    rating: 4,
-    seller: {
-      name: 'Pedro Souza',
-      avatar: 'PS',
-    },
-  },
-  {
-    id: 4,
-    title: 'Administração de Marketing',
-    course: 'Administração',
-    price: 'R$ 60,00',
-    rating: 5,
-    seller: {
-      name: 'Ana Costa',
-      avatar: 'AC',
-    },
-  },
-];
+interface FeaturedBooksProps {
+  livros: Array<{
+    id: string;
+    titulo: string;
+    descricao?: string;
+    preco: number;
+    condicao: string;
+    tipo: string;
+    vendedor?: {
+      nome: string;
+      avaliacao: number;
+      curso?: string;
+    };
+    livro?: {
+      titulo: string;
+      autor: string;
+      capa: string;
+    };
+    fotos?: string[];
+  }>;
+  onBookClick: (bookId: string) => void;
+}
 
-export function FeaturedBooks({ onBookClick }: { onBookClick?: () => void }) {
+export function FeaturedBooks({ livros, onBookClick }: FeaturedBooksProps) {
+  const [sortBy, setSortBy] = useState<string>('default');
+
+  if (!livros || livros.length === 0) {
+    return (
+      <div className="text-center py-12 bg-gray-50 rounded-lg">
+        <p className="text-gray-500 text-lg">📭 Nenhum livro disponível no momento.</p>
+        <p className="text-gray-400 text-sm mt-2">Seja o primeiro a anunciar um livro!</p>
+      </div>
+    );
+  }
+
+  const sortedLivros = [...livros].sort((a, b) => {
+    switch(sortBy) {
+      case 'price-low':
+        return a.preco - b.preco;
+      case 'price-high':
+        return b.preco - a.preco;
+      case 'rating':
+        return (b.vendedor?.avaliacao || 0) - (a.vendedor?.avaliacao || 0);
+      case 'condition':
+        const order: Record<string, number> = { novo: 0, quase_novo: 1, bom: 2, aceitavel: 3, ruim: 4 };
+        return (order[a.condicao] ?? 99) - (order[b.condicao] ?? 99);
+      default:
+        return 0;
+    }
+  });
+
   return (
-    <section className="py-12 bg-gray-50">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center gap-2 mb-6">
-          <Star className="w-6 h-6 text-[#27AE60] fill-[#27AE60]" />
-          <h2 className="text-2xl md:text-3xl font-bold text-[#2C3E50]">
-            Livros em Destaque
-          </h2>
-        </div>
-
-        <div className="overflow-x-auto pb-4 -mx-4 px-4">
-          <div className="flex gap-4 min-w-min">
-            {featuredBooks.map((book) => (
-              <div
-                key={book.id}
-                onClick={onBookClick}
-                className="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow p-4 flex gap-4 min-w-[320px] md:min-w-[380px] cursor-pointer hover:transform hover:scale-[1.02] transition-all"
-              >
-                {/* Imagem do livro */}
-                <div className="w-24 h-32 bg-gray-200 rounded flex-shrink-0 flex items-center justify-center">
-                  <span className="text-gray-400 text-xs text-center px-2">
-                    Capa do Livro
-                  </span>
-                </div>
-
-                {/* Informações do livro */}
-                <div className="flex-1 flex flex-col justify-between">
-                  <div>
-                    <h3 className="font-bold text-gray-900 mb-1 line-clamp-2">
-                      {book.title}
-                    </h3>
-                    <p className="text-sm text-gray-600 mb-2">{book.course}</p>
-                    
-                    {/* Avaliação */}
-                    <div className="flex gap-1 mb-2">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`w-4 h-4 ${
-                            i < book.rating
-                              ? 'text-[#f39c12] fill-[#f39c12]'
-                              : 'text-gray-300'
-                          }`}
-                        />
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Preço e vendedor */}
-                  <div className="flex items-center justify-between">
-                    <span
-                      className={`font-bold ${
-                        book.price === 'TROCA'
-                          ? 'text-[#3498db]'
-                          : book.price === 'DOAÇÃO'
-                          ? 'text-[#e67e22]'
-                          : 'text-[#27AE60]'
-                      }`}
-                    >
-                      {book.price}
-                    </span>
-                    
-                    {/* Vendedor */}
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 bg-[#2C3E50] rounded-full flex items-center justify-center text-white text-xs">
-                        {book.seller.avatar}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+    <div>
+      <div className="flex justify-between items-center mb-6">
+        <p className="text-gray-600">
+          Mostrando <span className="font-bold">{sortedLivros.length}</span> livros disponíveis
+        </p>
+        <div className="flex items-center gap-2">
+          <label htmlFor="sort-by" className="text-gray-600 text-sm">Ordenar por:</label>
+          <select 
+            id="sort-by"
+            className="border rounded-md px-3 py-1 text-sm"
+            value={sortBy}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setSortBy(e.target.value)}
+          >
+            <option value="default">Relevância</option>
+            <option value="price-low">Preço: menor primeiro</option>
+            <option value="price-high">Preço: maior primeiro</option>
+            <option value="rating">Melhor avaliação</option>
+            <option value="condition">Melhor estado</option>
+          </select>
         </div>
       </div>
-    </section>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {sortedLivros.slice(0, 6).map((livro) => (
+          <div 
+            key={livro.id}
+            className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow cursor-pointer border border-gray-100"
+            onClick={() => onBookClick(livro.id)}
+          >
+            <div className="h-56 overflow-hidden">
+              <img
+                src={livro.livro?.capa || livro.fotos?.[0] || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=400'}
+                alt={livro.titulo}
+                className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+              />
+            </div>
+            
+            <div className="p-5">
+              <h3 className="font-bold text-lg text-gray-800 mb-2 line-clamp-2">
+                {livro.titulo}
+              </h3>
+              
+              <p className="text-gray-600 text-sm mb-3">
+                {livro.livro?.autor || 'Autor não especificado'}
+              </p>
+              
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <span className="text-2xl font-bold text-blue-600">
+                    R$ {livro.preco.toFixed(2)}
+                  </span>
+                  <span className="text-gray-500 text-sm ml-2">
+                    {livro.tipo === 'doacao' ? ' (Doação)' : livro.tipo === 'troca' ? ' (Troca)' : ''}
+                  </span>
+                </div>
+                
+                <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                  livro.condicao === 'novo' ? 'bg-green-100 text-green-800' :
+                  livro.condicao === 'quase_novo' ? 'bg-blue-100 text-blue-800' :
+                  livro.condicao === 'bom' ? 'bg-yellow-100 text-yellow-800' :
+                  'bg-gray-100 text-gray-800'
+                }`}>
+                  {livro.condicao}
+                </span>
+              </div>
+              
+              {livro.vendedor && (
+                <div className="flex items-center justify-between border-t border-gray-100 pt-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                      <span className="text-blue-600 font-bold text-sm">
+                        {livro.vendedor.nome ? livro.vendedor.nome.charAt(0) : 'U'}
+                      </span>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-700">
+                        {livro.vendedor.nome}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {livro.vendedor.curso || 'Estudante'}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center">
+                    <span className="text-yellow-500 mr-1">★</span>
+                    <span className="font-medium">{(livro.vendedor.avaliacao ?? 0).toFixed(1)}</span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
