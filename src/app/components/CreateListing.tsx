@@ -193,18 +193,59 @@ export function CreateListing({ onBack, onSuccess }: { onBack?: () => void; onSu
     }
   };
 
-  const handlePublish = () => {
-    setIsPublishing(true);
+  const handlePublish = async () => {
+  if (!validateStep()) return;
+  
+  setIsPublishing(true);
+  
+  try {
+    const livroData = {
+      titulo: data.bookInfo.title,
+      autor: data.bookInfo.author,
+      preco: data.listingType === 'venda' ? parseFloat(data.price) : 0,
+      condicao: data.condition,
+      descricao: data.description,
+      curso: data.bookInfo.course,
+      tipo: data.listingType,
+      imagem: data.photos.length > 0 ? data.photos[0] : 'https://via.placeholder.com/150',
+      vendedor: 'Usuário Atual', 
+      avaliacao: 5.0, 
+      localizacao: data.locations.length > 0 ? data.locations[0] : 'Campus Central'
+    };
     
-    setTimeout(() => {
-      setIsPublishing(false);
+    console.log('Enviando dados:', livroData);
+    
+    const response = await fetch('http://localhost:3001/api/livros', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(livroData),
+    });
+    
+    if (response.ok) {
+      const result = await response.json();
+      console.log('Resposta do backend:', result);
+      
       setShowSuccess(true);
       
       setTimeout(() => {
         onSuccess?.();
       }, 2000);
-    }, 1500);
-  };
+      
+    } else {
+      const errorData = await response.json();
+      console.error('Erro do backend:', errorData);
+      alert(`Erro ao publicar: ${errorData.error || 'Falha no servidor'}`);
+    }
+    
+  } catch (error) {
+    console.error('Erro de conexão:', error);
+    alert('Erro de conexão com o servidor. Verifique se o backend está rodando.');
+  } finally {
+    setIsPublishing(false);
+  }
+};
 
   const handleLocationToggle = (location: string) => {
     if (data.locations.includes(location)) {

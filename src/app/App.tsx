@@ -9,13 +9,14 @@ import { BookDetails } from './components/BookDetails';
 import { Chat } from './components/Chat';
 import { useState, useEffect } from 'react';
 import { Livro } from './types';
+import { CreateListing } from './components/CreateListing';
 
 export default function App() {
-  const [view, setView] = useState<'home' | 'details' | 'chat'>('home');
   const [livros, setLivros] = useState<Livro[]>([]);
   const [selectedBook, setSelectedBook] = useState<Livro | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [view, setView] = useState<'home' | 'details' | 'chat' | 'criar-anuncio'>('home');
 
   useEffect(() => {
   fetch('http://localhost:3001/api/livros')  
@@ -124,11 +125,30 @@ export default function App() {
     );
   }
 
+  if (view === 'criar-anuncio') {
+  return <CreateListing 
+    onBack={() => setView('home')}
+    onSuccess={() => {
+      alert('Anúncio criado com sucesso!');
+      setView('home');
+      window.location.reload(); 
+    }}
+  />;
+}
+
   return (
     <div className="min-h-screen bg-white font-['Inter',sans-serif]">
       <Header />
       <main>
-        <HeroSection />
+        <HeroSection 
+  onSellBook={() => setView('criar-anuncio')}
+  onSearchBook={() => {
+    alert('Funcionalidade de busca em desenvolvimento!');
+  }}
+  onDonateBook={() => {
+    alert('Funcionalidade de doação em desenvolvimento!');
+  }}
+/>
         
         <section className="container mx-auto px-4 py-8">
           <h2 className="text-3xl font-bold mb-8 text-gray-800">📚 Livros em Destaque</h2>
