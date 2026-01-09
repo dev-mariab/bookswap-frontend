@@ -8,26 +8,7 @@ import { Footer } from './components/Footer';
 import { BookDetails } from './components/BookDetails';
 import { Chat } from './components/Chat';
 import { useState, useEffect } from 'react';
-
-interface Livro {
-  id: string;
-  titulo: string;
-  descricao: string;
-  preco: number;
-  condicao: string;
-  tipo: string;
-  vendedor: {
-    nome: string;
-    avaliacao: number;
-    curso: string;
-  };
-  livro: {
-    titulo: string;
-    autor: string;
-    capa: string;
-  };
-  fotos: string[];
-}
+import { Livro } from './types';
 
 export default function App() {
   const [view, setView] = useState<'home' | 'details' | 'chat'>('home');
@@ -37,26 +18,55 @@ export default function App() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    fetch('http://localhost:3001/api/anuncios')
-      .then(response => {
-        if (!response.ok) throw new Error('Erro ao conectar com o servidor');
-        return response.json();
-      })
-      .then(data => {
-        console.log('Dados recebidos:', data);
-        if (data.data) {
-          setLivros(data.data);
-        } else if (Array.isArray(data)) {
-          setLivros(data);
+  fetch('http://localhost:3001/api/livros')  
+    .then(response => {
+      if (!response.ok) throw new Error('Erro ao conectar com o servidor');
+      return response.json();
+    })
+    .then(data => {
+      console.log('Dados recebidos de /api/livros:', data);
+      
+      if (data.data) {
+        interface ApiLivro {
+          id: string;
+          titulo: string;
+          autor?: string;
+          preco?: number;
+          condicao?: string;
+          vendedor?: string;
+          avaliacao?: number;
+          imagem?: string;
         }
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error('Erro:', err);
-        setError('Não foi possível carregar os livros. Verifique se o backend está rodando.');
-        setLoading(false);
-      });
-  }, []);
+
+        const livrosTransformados = data.data.map((livro: ApiLivro) => ({
+          id: livro.id,
+          titulo: livro.titulo,
+          descricao: `Livro "${livro.titulo}" por ${livro.autor}`,
+          preco: livro.preco ?? 0,
+          condicao: livro.condicao ?? '',
+          tipo: 'livro_didatico',
+          vendedor: {
+            nome: livro.vendedor ?? 'Desconhecido',
+            avaliacao: livro.avaliacao ?? 0,
+            curso: 'Engenharia'
+          },
+          livro: {
+            titulo: livro.titulo,
+            autor: livro.autor,
+            capa: livro.imagem
+          },
+          fotos: livro.imagem ? [livro.imagem] : []
+        }));
+        setLivros(livrosTransformados as unknown as Livro[]);
+      }
+      setLoading(false);
+    })
+    .catch(err => {
+      console.error('Erro:', err);
+      setError('Não foi possível carregar os livros. Verifique se o backend está rodando.');
+      setLoading(false);
+    });
+}, []);
 
   const handleBookClick = (bookId: string) => {
     const book = livros.find(l => l.id === bookId) || livros[0];
@@ -69,10 +79,42 @@ export default function App() {
   };
 
   if (view === 'chat') {
+    if (!selectedBook) {
+      return (
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-gray-700">Nenhum livro selecionado para o chat.</p>
+            <button
+              onClick={() => setView('home')}
+              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md"
+            >
+              Voltar para lista
+            </button>
+          </div>
+        </div>
+      );
+    }
+
     return <Chat onBack={() => setView('details')} book={selectedBook} />;
   }
   
   if (view === 'details') {
+    if (!selectedBook) {
+      return (
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-gray-700">Nenhum livro selecionado.</p>
+            <button
+              onClick={() => setView('home')}
+              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md"
+            >
+              Voltar
+            </button>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <BookDetails 
         book={selectedBook} 

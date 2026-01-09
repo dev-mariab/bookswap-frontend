@@ -1,25 +1,8 @@
 import React, { useState } from 'react';
+import { Livro } from '../types';
 
 interface FeaturedBooksProps {
-  livros: Array<{
-    id: string;
-    titulo: string;
-    descricao?: string;
-    preco: number;
-    condicao: string;
-    tipo: string;
-    vendedor?: {
-      nome: string;
-      avaliacao: number;
-      curso?: string;
-    };
-    livro?: {
-      titulo: string;
-      autor: string;
-      capa: string;
-    };
-    fotos?: string[];
-  }>;
+  livros: Livro[];
   onBookClick: (bookId: string) => void;
 }
 

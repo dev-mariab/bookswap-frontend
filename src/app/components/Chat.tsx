@@ -1,5 +1,5 @@
-import { ArrowLeft, MoreVertical, Send, Paperclip, Smile, Shield, Check, CheckCheck, AlertCircle, X } from 'lucide-react';
-import { useState, useRef, useEffect } from 'react';
+import { ArrowLeft, MoreVertical, Send, Paperclip, Smile, Shield, Check, AlertCircle, X } from 'lucide-react';
+import React, { useState, useRef, useEffect, ChangeEvent } from 'react';
 
 interface Message {
   id: number;
@@ -76,7 +76,14 @@ const initialMessages: Message[] = [
   },
 ];
 
-export function Chat({ onBack }: { onBack?: () => void }) {
+import { Livro } from '../types';
+
+interface ChatProps {
+  onBack?: () => void;
+  book?: Livro;
+}
+
+export function Chat({ onBack }: ChatProps) {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -86,13 +93,13 @@ export function Chat({ onBack }: { onBack?: () => void }) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const handleSend = () => {
     if (inputText.trim() || attachedImage) {
@@ -107,7 +114,6 @@ export function Chat({ onBack }: { onBack?: () => void }) {
       setInputText('');
       setAttachedImage(null);
 
-      // Simular status de entrega
       setTimeout(() => {
         setMessages(prev => prev.map(msg => 
           msg.id === newMessage.id ? { ...msg, status: 'delivered' as const } : msg
@@ -120,7 +126,6 @@ export function Chat({ onBack }: { onBack?: () => void }) {
         ));
       }, 2000);
 
-      // Simular indicador de digitação
       setTimeout(() => {
         setIsTyping(true);
       }, 3000);
@@ -135,7 +140,7 @@ export function Chat({ onBack }: { onBack?: () => void }) {
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
@@ -166,9 +171,9 @@ export function Chat({ onBack }: { onBack?: () => void }) {
       case 'sent':
         return <Check className="w-3 h-3" />;
       case 'delivered':
-        return <CheckCheck className="w-3 h-3" />;
+        return <Check className="w-3 h-3" />;
       case 'read':
-        return <CheckCheck className="w-3 h-3 text-[#27AE60]" />;
+        return <Check className="w-3 h-3 text-[#27AE60]" />;
       case 'error':
         return <AlertCircle className="w-3 h-3 text-red-500" />;
       default:
@@ -178,10 +183,9 @@ export function Chat({ onBack }: { onBack?: () => void }) {
 
   return (
     <div className="h-screen flex flex-col bg-gray-50 font-['Inter',sans-serif]">
-      {/* Header */}
       <header className="bg-white shadow-sm px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-3 flex-1">
-          <button onClick={onBack} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+          <button onClick={() => onBack?.()} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
             <ArrowLeft className="w-5 h-5 text-gray-700" />
           </button>
           
@@ -219,7 +223,6 @@ export function Chat({ onBack }: { onBack?: () => void }) {
         </div>
       </header>
 
-      {/* Contexto da conversa */}
       <div className="bg-white border-b border-gray-200 px-4 py-3">
         <div className="flex items-center gap-3 bg-blue-50 rounded-lg p-3">
           <div className="w-16 h-20 bg-gray-200 rounded flex-shrink-0 flex items-center justify-center">
@@ -237,7 +240,6 @@ export function Chat({ onBack }: { onBack?: () => void }) {
         </div>
       </div>
 
-      {/* Área de mensagens */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
         {messages.map((message) => {
           if (message.type === 'offer') {
@@ -315,7 +317,6 @@ export function Chat({ onBack }: { onBack?: () => void }) {
           );
         })}
 
-        {/* Proposta de encontro */}
         {showMeetingProposal && (
           <div className="flex justify-center">
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 max-w-sm relative">
@@ -339,7 +340,6 @@ export function Chat({ onBack }: { onBack?: () => void }) {
           </div>
         )}
 
-        {/* Indicador de digitação */}
         {isTyping && (
           <div className="flex justify-start">
             <div className="bg-gray-200 rounded-lg rounded-tl-sm px-4 py-3">
@@ -355,7 +355,6 @@ export function Chat({ onBack }: { onBack?: () => void }) {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Preview de imagem anexada */}
       {attachedImage && (
         <div className="px-4 py-2 bg-white border-t border-gray-200">
           <div className="relative inline-block">
@@ -370,7 +369,6 @@ export function Chat({ onBack }: { onBack?: () => void }) {
         </div>
       )}
 
-      {/* Barra de ações rápidas */}
       <div className="bg-white border-t border-gray-200 px-4 py-2">
         <div className="flex gap-2 overflow-x-auto pb-2">
           <button
@@ -391,7 +389,6 @@ export function Chat({ onBack }: { onBack?: () => void }) {
         </div>
       </div>
 
-      {/* Input área */}
       <div className="bg-white border-t border-gray-200 px-4 py-3">
         <div className="flex items-end gap-2">
           <input

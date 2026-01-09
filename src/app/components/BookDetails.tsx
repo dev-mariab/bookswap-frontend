@@ -1,5 +1,7 @@
+import { Livro } from '../types';
+
 interface BookDetailsProps {
-  book: any;
+  book: Livro | null;
   onBack: () => void;
   onOpenChat: () => void;
 }
