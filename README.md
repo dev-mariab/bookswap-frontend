@@ -1,11 +1,8 @@
+BookSwap Academy
 
-  # aplicacao_pds
+Uma plataforma para troca e venda de livros universitários entre estudantes.
 
-  This is a code bundle for aplicacao_pds. The original project is available at https://www.figma.com/design/Uu7woHfxAicLneA3ubCDQw/aplicacao_pds.
+Tecnologias:
+Frontend: React com TypeScript e Tailwind CSS, Backend: Node.js, Express e PostgreSQL, ORM: Sequelize para gerenciamento do banco.
 
-  ## Running the code
-
-  Run `npm i` to install the dependencies.
-
-  Run `npm run dev` to start the development server.
-  
+Objetivo: Facilitar o acesso a livros acadêmicos através de trocas, vendas e doações entre estudantes, criando uma comunidade universitária mais colaborativa.
