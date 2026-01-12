@@ -1,5 +1,6 @@
 import { X, Camera, Search, Upload, Trash2, CheckCircle, AlertCircle, MapPin, Clock } from 'lucide-react';
 import { useState, useRef, ChangeEvent } from 'react';
+import { BookObserverManager } from '../observers/BookObserver';
 
 interface BookInfo {
   title: string;
@@ -214,7 +215,7 @@ export function CreateListing({ onBack, onSuccess }: { onBack?: () => void; onSu
     };
     
     console.log('Enviando dados:', livroData);
-    
+
     const response = await fetch('http://localhost:3001/api/livros', {
       method: 'POST',
       headers: {
@@ -226,6 +227,9 @@ export function CreateListing({ onBack, onSuccess }: { onBack?: () => void; onSu
     if (response.ok) {
       const result = await response.json();
       console.log('Resposta do backend:', result);
+      
+      const bookSubject = BookObserverManager.getInstance();
+      bookSubject.notify(result.data || livroData);
       
       setShowSuccess(true);
       
