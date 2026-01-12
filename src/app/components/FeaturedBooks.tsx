@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Livro } from '../types';
+import { Star } from 'lucide-react';
 
 interface FeaturedBooksProps {
   livros: Livro[];
   onBookClick: (bookId: string) => void;
+  totalLivros?: number;
 }
 
 export function FeaturedBooks({ livros, onBookClick }: FeaturedBooksProps) {
@@ -12,7 +14,7 @@ export function FeaturedBooks({ livros, onBookClick }: FeaturedBooksProps) {
   if (!livros || livros.length === 0) {
     return (
       <div className="text-center py-12 bg-gray-50 rounded-lg">
-        <p className="text-gray-500 text-lg">📭 Nenhum livro disponível no momento.</p>
+        <p className="text-gray-500 text-lg">Nenhum livro disponível no momento.</p>
         <p className="text-gray-400 text-sm mt-2">Seja o primeiro a anunciar um livro!</p>
       </div>
     );
@@ -119,10 +121,10 @@ export function FeaturedBooks({ livros, onBookClick }: FeaturedBooksProps) {
                     </div>
                   </div>
                   
-                  <div className="flex items-center">
-                    <span className="text-yellow-500 mr-1">★</span>
-                    <span className="font-medium">{(livro.vendedor.avaliacao ?? 0).toFixed(1)}</span>
-                  </div>
+                    <div className="flex items-center">
+                      <Star className="w-4 h-4 text-yellow-500 mr-1" />
+                      <span className="font-medium">{(livro.vendedor.avaliacao ?? 0).toFixed(1)}</span>
+                    </div>
                 </div>
               )}
             </div>

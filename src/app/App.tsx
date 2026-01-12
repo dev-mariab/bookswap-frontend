@@ -10,6 +10,7 @@ import { Chat } from './components/Chat';
 import { useState, useEffect } from 'react';
 import { Livro } from './types';
 import { CreateListing } from './components/CreateListing';
+import { BookFilters } from './components/BookFilters';
 
 export default function App() {
   const [livros, setLivros] = useState<Livro[]>([]);
@@ -17,57 +18,102 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [view, setView] = useState<'home' | 'details' | 'chat' | 'criar-anuncio'>('home');
+  const [filters, setFilters] = useState({ 
+    curso: '', 
+    condicao: '', 
+    tipo: '', 
+    precoMin: '', 
+    precoMax: '' 
+  });
 
   useEffect(() => {
-  fetch('http://localhost:3001/api/livros')  
-    .then(response => {
-      if (!response.ok) throw new Error('Erro ao conectar com o servidor');
-      return response.json();
-    })
-    .then(data => {
-      console.log('Dados recebidos de /api/livros:', data);
-      
-      if (data.data) {
-        interface ApiLivro {
-          id: string;
-          titulo: string;
-          autor?: string;
-          preco?: number;
-          condicao?: string;
-          vendedor?: string;
-          avaliacao?: number;
-          imagem?: string;
-        }
+    fetch('http://localhost:3001/api/livros')  
+      .then(response => {
+        if (!response.ok) throw new Error('Erro ao conectar com o servidor');
+        return response.json();
+      })
+      .then(data => {
+        console.log('Dados recebidos de /api/livros:', data);
+        
+        if (data.data) {
+          interface ApiLivro {
+            id: string;
+            titulo: string;
+            autor?: string;
+            preco?: number;
+            condicao?: string;
+            vendedor?: string;
+            avaliacao?: number;
+            imagem?: string;
+          }
 
-        const livrosTransformados = data.data.map((livro: ApiLivro) => ({
-          id: livro.id,
-          titulo: livro.titulo,
-          descricao: `Livro "${livro.titulo}" por ${livro.autor}`,
-          preco: livro.preco ?? 0,
-          condicao: livro.condicao ?? '',
-          tipo: 'livro_didatico',
-          vendedor: {
-            nome: livro.vendedor ?? 'Desconhecido',
-            avaliacao: livro.avaliacao ?? 0,
-            curso: 'Engenharia'
-          },
-          livro: {
+          const livrosTransformados = data.data.map((livro: ApiLivro) => ({
+            id: livro.id,
             titulo: livro.titulo,
-            autor: livro.autor,
-            capa: livro.imagem
-          },
-          fotos: livro.imagem ? [livro.imagem] : []
-        }));
-        setLivros(livrosTransformados as unknown as Livro[]);
-      }
-      setLoading(false);
-    })
-    .catch(err => {
-      console.error('Erro:', err);
-      setError('Não foi possível carregar os livros. Verifique se o backend está rodando.');
-      setLoading(false);
+            descricao: `Livro "${livro.titulo}" por ${livro.autor}`,
+            preco: livro.preco ?? 0,
+            condicao: livro.condicao ?? '',
+            tipo: 'livro_didatico',
+            vendedor: {
+              nome: livro.vendedor ?? 'Desconhecido',
+              avaliacao: livro.avaliacao ?? 0,
+              curso: 'Engenharia'
+            },
+            livro: {
+              titulo: livro.titulo,
+              autor: livro.autor,
+              capa: livro.imagem
+            },
+            fotos: livro.imagem ? [livro.imagem] : []
+          }));
+          setLivros(livrosTransformados as unknown as Livro[]);
+        }
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Erro:', err);
+        setError('Não foi possível carregar os livros. Verifique se o backend está rodando.');
+        setLoading(false);
+      });
+  }, []);
+
+  
+  const livrosFiltrados = livros.filter(livro => {
+    if (filters.curso && livro.vendedor?.curso !== filters.curso) {
+      return false;
+    }
+    
+    if (filters.condicao && livro.condicao !== filters.condicao) {
+      return false;
+    }
+    
+    if (filters.tipo && livro.tipo !== filters.tipo) {
+      return false;
+    }
+    
+    if (filters.precoMin && livro.preco < parseFloat(filters.precoMin)) {
+      return false;
+    }
+    if (filters.precoMax && livro.preco > parseFloat(filters.precoMax)) {
+      return false;
+    }
+    
+    return true;
+  });
+
+  const cursosDisponiveis = Array.from(
+    new Set(livros.map(l => l.vendedor?.curso).filter((c): c is string => typeof c === 'string'))
+  );
+
+  const resetFilters = () => {
+    setFilters({
+      curso: '',
+      condicao: '',
+      tipo: '',
+      precoMin: '',
+      precoMax: ''
     });
-}, []);
+  };
 
   const handleBookClick = (bookId: string) => {
     const book = livros.find(l => l.id === bookId) || livros[0];
@@ -126,32 +172,40 @@ export default function App() {
   }
 
   if (view === 'criar-anuncio') {
-  return <CreateListing 
-    onBack={() => setView('home')}
-    onSuccess={() => {
-      alert('Anúncio criado com sucesso!');
-      setView('home');
-      window.location.reload(); 
-    }}
-  />;
-}
+    return <CreateListing 
+      onBack={() => setView('home')}
+      onSuccess={() => {
+        alert('Anúncio criado com sucesso!');
+        setView('home');
+        window.location.reload(); 
+      }}
+    />;
+  }
 
+  
   return (
     <div className="min-h-screen bg-white font-['Inter',sans-serif]">
       <Header />
       <main>
         <HeroSection 
-  onSellBook={() => setView('criar-anuncio')}
-  onSearchBook={() => {
-    alert('Funcionalidade de busca em desenvolvimento!');
-  }}
-  onDonateBook={() => {
-    alert('Funcionalidade de doação em desenvolvimento!');
-  }}
-/>
+          onSellBook={() => setView('criar-anuncio')}
+          onSearchBook={() => {
+            alert('Funcionalidade de busca em desenvolvimento!');
+          }}
+          onDonateBook={() => {
+            alert('Funcionalidade de doação em desenvolvimento!');
+          }}
+        />
         
         <section className="container mx-auto px-4 py-8">
-          <h2 className="text-3xl font-bold mb-8 text-gray-800">📚 Livros em Destaque</h2>
+          <h2 className="text-3xl font-bold mb-8 text-gray-800">Livros em Destaque</h2>
+
+          <BookFilters 
+            filters={filters}
+            onFilterChange={setFilters}
+            onReset={resetFilters}
+            cursosDisponiveis={cursosDisponiveis}
+          />
           
           {loading ? (
             <div className="text-center py-12">
@@ -161,8 +215,7 @@ export default function App() {
           ) : error ? (
             <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
               <p className="text-red-700 font-medium">{error}</p>
-              <p className="text-sm text-red-600 mt-2">
-              </p>
+              <p className="text-sm text-red-600 mt-2"></p>
               <button 
                 onClick={() => window.location.reload()}
                 className="mt-4 px-4 py-2 bg-red-100 text-red-700 rounded-md hover:bg-red-200"
@@ -172,8 +225,9 @@ export default function App() {
             </div>
           ) : (
             <FeaturedBooks 
-              livros={livros} 
+              livros={livrosFiltrados}
               onBookClick={handleBookClick} 
+              totalLivros={livros.length}
             />
           )}
         </section>

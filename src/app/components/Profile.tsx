@@ -57,12 +57,12 @@ const reviews = [
 ];
 
 const achievements = [
-  { id: 1, icon: '🔥', title: 'Vendedor do Mês', description: 'Maior número de vendas em Março' },
-  { id: 2, icon: '📚', title: '10 Trocas Concluídas', description: 'Completou 10 trocas com sucesso' },
-  { id: 3, icon: '⚡', title: 'Resposta Rápida', description: 'Responde em menos de 1h' },
-  { id: 4, icon: '⭐', title: '5 Avaliações 5-estrelas', description: 'Recebeu 5 avaliações perfeitas' },
-  { id: 5, icon: '🏆', title: 'Top 3 Reputação', description: 'Entre os 3 melhores do mês' },
-  { id: 6, icon: '✓', title: 'Membro Verificado', description: 'Perfil verificado pela plataforma' },
+  { id: 1, icon: '', title: 'Vendedor do Mês', description: 'Maior número de vendas em Março' },
+  { id: 2, icon: '', title: '10 Trocas Concluídas', description: 'Completou 10 trocas com sucesso' },
+  { id: 3, icon: '', title: 'Resposta Rápida', description: 'Responde em menos de 1h' },
+  { id: 4, icon: '', title: '5 Avaliações 5-estrelas', description: 'Recebeu 5 avaliações perfeitas' },
+  { id: 5, icon: '', title: 'Top 3 Reputação', description: 'Entre os 3 melhores do mês' },
+  { id: 6, icon: '', title: 'Membro Verificado', description: 'Perfil verificado pela plataforma' },
 ];
 
 const wishlist = [
@@ -85,7 +85,7 @@ export function Profile({ onBack, isOwnProfile = true }: { onBack?: () => void; 
   const filteredBooks = myBooks.filter(book => {
     if (filter === 'ativos') return book.status === 'ativo';
     if (filter === 'vendidos') return book.status === 'vendido';
-    return false; // favoritos - implementar lógica
+    return false;
   });
 
   const renderTabContent = () => {
@@ -468,7 +468,7 @@ export function Profile({ onBack, isOwnProfile = true }: { onBack?: () => void; 
                   : 'text-gray-500 hover:text-gray-700'
               }`}
             >
-              📚 Meus Anúncios
+              Meus Anúncios
             </button>
             <button
               onClick={() => setActiveTab('conversas')}
@@ -478,7 +478,7 @@ export function Profile({ onBack, isOwnProfile = true }: { onBack?: () => void; 
                   : 'text-gray-500 hover:text-gray-700'
               }`}
             >
-              💬 Conversas
+              Conversas
             </button>
             <button
               onClick={() => setActiveTab('avaliacoes')}
@@ -488,7 +488,7 @@ export function Profile({ onBack, isOwnProfile = true }: { onBack?: () => void; 
                   : 'text-gray-500 hover:text-gray-700'
               }`}
             >
-              ⭐ Avaliações
+              Avaliações
             </button>
             <button
               onClick={() => setActiveTab('configuracoes')}
