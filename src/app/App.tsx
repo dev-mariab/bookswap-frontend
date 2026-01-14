@@ -414,17 +414,6 @@ export default function App() {
               </button>
             </div>
           </div>
-          
-          <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-            <p className="text-sm text-blue-800">
-              <strong>Padrões Implementados:</strong> Observer (atualizações automáticas), 
-              Composite (componentes UI), Strategy (busca), Factory e Repository (backend)
-            </p>
-            <p className="text-xs text-blue-600 mt-1">
-              Ao criar um novo livro, a lista é atualizada automaticamente via Observer Pattern
-            </p>
-          </div>
-          
           <div className="mb-6">
             <div className="relative">
               <input
