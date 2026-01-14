@@ -131,7 +131,7 @@ export function BookDetails({ book, onBack, onOpenChat }: BookDetailsProps) {
                   onClick={() => alert('Livro adicionado aos favoritos!')}
                   className="px-6 py-3 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition"
                 >
-                  ❤️ Favoritar
+                  Favoritar
                 </button>
               </div>
             </div>

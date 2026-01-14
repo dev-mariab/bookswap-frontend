@@ -204,7 +204,6 @@ export function SearchResults({ onBack }: { onBack?: () => void }) {
             </button>
           </div>
 
-          {/* Estatísticas da busca */}
           <div className="mt-3 flex items-center justify-between flex-wrap gap-2">
             <div>
               <p className="text-sm text-gray-900 font-semibold">
@@ -224,7 +223,6 @@ export function SearchResults({ onBack }: { onBack?: () => void }) {
 
       <div className="container mx-auto px-4 py-6">
         <div className="flex gap-6">
-          {/* Sidebar de filtros - Desktop */}
           <aside className={`w-64 flex-shrink-0 hidden lg:block ${showFilters ? '' : 'lg:hidden'}`}>
             <div className="bg-white rounded-lg shadow-md p-6 sticky top-24">
               <div className="flex items-center justify-between mb-4">
@@ -239,7 +237,6 @@ export function SearchResults({ onBack }: { onBack?: () => void }) {
                 )}
               </div>
 
-              {/* Tipo */}
               <div className="mb-6">
                 <h4 className="font-semibold text-gray-900 mb-3">Tipo</h4>
                 <div className="space-y-2">
@@ -273,7 +270,6 @@ export function SearchResults({ onBack }: { onBack?: () => void }) {
                 </div>
               </div>
 
-              {/* Preço */}
               <div className="mb-6">
                 <h4 className="font-semibold text-gray-900 mb-3">Preço</h4>
                 <div className="space-y-3">
@@ -308,7 +304,6 @@ export function SearchResults({ onBack }: { onBack?: () => void }) {
                 </div>
               </div>
 
-              {/* Estado do Livro */}
               <div className="mb-6">
                 <h4 className="font-semibold text-gray-900 mb-3">Estado do Livro</h4>
                 <div className="space-y-2">
@@ -326,7 +321,6 @@ export function SearchResults({ onBack }: { onBack?: () => void }) {
                 </div>
               </div>
 
-              {/* Localização */}
               <div className="mb-6">
                 <h4 className="font-semibold text-gray-900 mb-3">Localização</h4>
                 <div className="space-y-2">
@@ -354,7 +348,6 @@ export function SearchResults({ onBack }: { onBack?: () => void }) {
                 </div>
               </div>
 
-              {/* Disciplina */}
               <div className="mb-6">
                 <h4 className="font-semibold text-gray-900 mb-3">Disciplina</h4>
                 <div className="space-y-2">
@@ -375,7 +368,6 @@ export function SearchResults({ onBack }: { onBack?: () => void }) {
                 </div>
               </div>
 
-              {/* Ordenar por */}
               <div>
                 <h4 className="font-semibold text-gray-900 mb-3">Ordenar por</h4>
                 <select
@@ -393,7 +385,6 @@ export function SearchResults({ onBack }: { onBack?: () => void }) {
             </div>
           </aside>
 
-          {/* Modal de filtros - Mobile */}
           {showFilters && (
             <div className="fixed inset-0 bg-black/50 z-30 lg:hidden" onClick={() => setShowFilters(false)}>
               <div
@@ -407,9 +398,7 @@ export function SearchResults({ onBack }: { onBack?: () => void }) {
                   </button>
                 </div>
                 <div className="p-4">
-                  {/* Conteúdo dos filtros - mesmo do desktop */}
                   <div className="space-y-6">
-                    {/* Aqui você repetiria os mesmos filtros do desktop */}
                   </div>
                   <div className="flex gap-3 mt-6">
                     <button
@@ -430,9 +419,7 @@ export function SearchResults({ onBack }: { onBack?: () => void }) {
             </div>
           )}
 
-          {/* Área de resultados */}
           <div className="flex-1">
-            {/* View toggles e informações */}
             <div className="flex items-center justify-between mb-4">
               <p className="text-sm text-gray-600">
                 Mostrando {((currentPage - 1) * resultsPerPage) + 1}-{Math.min(currentPage * resultsPerPage, totalResults)} de {totalResults} resultados
@@ -458,7 +445,6 @@ export function SearchResults({ onBack }: { onBack?: () => void }) {
               </div>
             </div>
 
-            {/* Resultados */}
             {filteredBooks.length > 0 ? (
               <>
                 <div className={viewMode === 'grid' 
@@ -472,13 +458,11 @@ export function SearchResults({ onBack }: { onBack?: () => void }) {
                         viewMode === 'list' ? 'flex' : ''
                       }`}
                     >
-                      {/* Imagem */}
                       <div className={`relative bg-gray-200 flex items-center justify-center ${
                         viewMode === 'list' ? 'w-32 h-32' : 'h-48'
                       }`}>
                         <span className="text-gray-400 text-xs">Capa</span>
                         
-                        {/* Badges especiais */}
                         <div className="absolute top-2 left-2 flex flex-col gap-1">
                           {book.isHighDemand && (
                             <span className="bg-red-500 text-white text-xs px-2 py-1 rounded font-semibold flex items-center gap-1">
@@ -503,13 +487,11 @@ export function SearchResults({ onBack }: { onBack?: () => void }) {
                           )}
                         </div>
 
-                        {/* Favoritar */}
                         <button className="absolute top-2 right-2 bg-white/90 p-1.5 rounded-full hover:bg-white transition-colors">
                           <Heart className="w-4 h-4 text-gray-600" />
                         </button>
                       </div>
 
-                      {/* Informações */}
                       <div className={`p-4 ${viewMode === 'list' ? 'flex-1' : ''}`}>
                         <div className="flex items-start gap-2 mb-2">
                           <h3 className={`font-semibold text-gray-900 flex-1 ${
@@ -569,7 +551,6 @@ export function SearchResults({ onBack }: { onBack?: () => void }) {
                   ))}
                 </div>
 
-                {/* Paginação */}
                 <div className="mt-8 flex items-center justify-between">
                   <button
                     disabled={currentPage === 1}
@@ -605,7 +586,6 @@ export function SearchResults({ onBack }: { onBack?: () => void }) {
                 </div>
               </>
             ) : (
-              /* Empty State */
               <div className="bg-white rounded-lg shadow-md p-12 text-center">
                 <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Search className="w-10 h-10 text-gray-400" />

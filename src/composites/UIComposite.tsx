@@ -1,4 +1,4 @@
-// bookswap-frontend/src/composites/UIComposite.tsx
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 
 export interface UIComponent {
@@ -7,8 +7,6 @@ export interface UIComponent {
   remove?(component: UIComponent): void;
   getChild?(index: number): UIComponent | null;
 }
-
-// Componente Leaf (folha)
 export class Button implements UIComponent {
   constructor(
     private label: string,
@@ -27,8 +25,6 @@ export class Button implements UIComponent {
     );
   }
 }
-
-// Componente Leaf para Input
 export class Input implements UIComponent {
   constructor(
     private placeholder: string,
@@ -49,8 +45,6 @@ export class Input implements UIComponent {
     );
   }
 }
-
-// Componente Composite (contém outros componentes)
 export class FormContainer implements UIComponent {
   private children: UIComponent[] = [];
   private title: string;
@@ -88,7 +82,6 @@ export class FormContainer implements UIComponent {
   }
 }
 
-// Composite para Card de Livro
 export class BookCard implements UIComponent {
   private children: UIComponent[] = [];
   private book: any;

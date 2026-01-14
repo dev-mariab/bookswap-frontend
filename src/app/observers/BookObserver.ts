@@ -1,4 +1,4 @@
-// bookswap-frontend/src/app/observers/BookObserver.ts
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export interface Observer {
   update(data: any): void;
 }

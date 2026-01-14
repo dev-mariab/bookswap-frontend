@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Header } from './components/Header';
 import { HeroSection } from './components/HeroSection';
 import { FeaturedBooks } from './components/FeaturedBooks';

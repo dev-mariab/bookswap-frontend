@@ -267,7 +267,7 @@ export function Chat({ onBack }: ChatProps) {
                 <div className="bg-green-50 border border-green-200 rounded-lg p-3 max-w-sm text-center">
                   <p className="text-sm font-semibold text-green-700 mb-2">✅ {message.text}</p>
                   <button className="px-4 py-2 bg-[#27AE60] text-white text-sm rounded-lg hover:bg-[#229954] transition-colors">
-                    📅 Combinar encontro
+                    Combinar encontro
                   </button>
                   <p className="text-xs text-gray-500 mt-2">{message.timestamp}</p>
                 </div>
@@ -327,13 +327,13 @@ export function Chat({ onBack }: ChatProps) {
                 <X className="w-4 h-4 text-gray-600" />
               </button>
               <p className="text-sm font-semibold text-gray-900 mb-2">Sugerir encontro</p>
-              <p className="text-sm text-gray-700 mb-3">⏰ Amanhã, 15h na Biblioteca Central?</p>
+              <p className="text-sm text-gray-700 mb-3">Amanhã, 15h na Biblioteca Central?</p>
               <div className="flex gap-2">
                 <button className="flex-1 px-3 py-2 bg-[#27AE60] text-white text-sm rounded-lg hover:bg-[#229954] transition-colors">
-                  ✅ Aceitar
+                  Aceitar
                 </button>
                 <button className="flex-1 px-3 py-2 bg-gray-500 text-white text-sm rounded-lg hover:bg-gray-600 transition-colors">
-                  🔄 Sugerir outro
+                  Sugerir outro
                 </button>
               </div>
             </div>
@@ -344,9 +344,9 @@ export function Chat({ onBack }: ChatProps) {
           <div className="flex justify-start">
             <div className="bg-gray-200 rounded-lg rounded-tl-sm px-4 py-3">
               <div className="flex gap-1">
-                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce typing-dot-1"></div>
+                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce typing-dot-2"></div>
+                <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce typing-dot-3"></div>
               </div>
             </div>
           </div>
@@ -375,16 +375,16 @@ export function Chat({ onBack }: ChatProps) {
             onClick={handleMakeOffer}
             className="px-3 py-1.5 bg-gray-100 text-gray-700 text-xs rounded-full hover:bg-gray-200 transition-colors whitespace-nowrap flex items-center gap-1"
           >
-            💰 Fazer oferta
+            Fazer oferta
           </button>
           <button
             onClick={handleSuggestMeeting}
             className="px-3 py-1.5 bg-gray-100 text-gray-700 text-xs rounded-full hover:bg-gray-200 transition-colors whitespace-nowrap flex items-center gap-1"
           >
-            📅 Sugerir encontro
+            Sugerir encontro
           </button>
           <button className="px-3 py-1.5 bg-gray-100 text-gray-700 text-xs rounded-full hover:bg-gray-200 transition-colors whitespace-nowrap flex items-center gap-1">
-            ⭐ Avaliar usuário
+            Avaliar usuário
           </button>
         </div>
       </div>

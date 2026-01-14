@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Livro } from '../types';
+import { Livro } from '../app/types';
 
 interface SearchStrategy {
   search(books: Livro[], term: string): Livro[];

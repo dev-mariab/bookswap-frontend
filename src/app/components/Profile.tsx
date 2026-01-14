@@ -93,7 +93,6 @@ export function Profile({ onBack, isOwnProfile = true }: { onBack?: () => void; 
       case 'anuncios':
         return (
           <div>
-            {/* Filtros */}
             <div className="flex gap-4 mb-6 border-b border-gray-200">
               <button
                 onClick={() => setFilter('ativos')}
@@ -127,7 +126,6 @@ export function Profile({ onBack, isOwnProfile = true }: { onBack?: () => void; 
               </button>
             </div>
 
-            {/* Grid de livros */}
             {filteredBooks.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {filteredBooks.map((book) => (
@@ -135,16 +133,13 @@ export function Profile({ onBack, isOwnProfile = true }: { onBack?: () => void; 
                     key={book.id}
                     className="bg-white rounded-lg shadow-md hover:shadow-xl transition-all cursor-pointer overflow-hidden"
                   >
-                    {/* Imagem do livro */}
                     <div className="relative h-48 bg-gray-200 flex items-center justify-center">
                       <span className="text-gray-400 text-xs">Capa</span>
                       
-                      {/* Badge de estado */}
                       <div className="absolute top-2 right-2 bg-yellow-500 text-white text-xs px-2 py-1 rounded font-semibold">
                         {book.condition}
                       </div>
                       
-                      {/* Badge de vendido */}
                       {book.status === 'vendido' && (
                         <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
                           <span className="text-white font-bold text-lg">VENDIDO</span>
@@ -152,14 +147,12 @@ export function Profile({ onBack, isOwnProfile = true }: { onBack?: () => void; 
                       )}
                     </div>
 
-                    {/* Informações */}
                     <div className="p-3">
                       <h3 className="font-semibold text-gray-900 text-sm mb-2 line-clamp-2 h-10">
                         {book.title}
                       </h3>
                       <p className="text-[#27AE60] font-bold mb-2">{book.price}</p>
                       
-                      {/* Stats */}
                       <div className="flex items-center justify-between text-xs text-gray-600">
                         <div className="flex items-center gap-1">
                           <Eye className="w-3 h-3" />
@@ -256,7 +249,6 @@ export function Profile({ onBack, isOwnProfile = true }: { onBack?: () => void; 
       case 'configuracoes':
         return (
           <div className="space-y-6">
-            {/* Conta */}
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
               <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
                 <h3 className="font-semibold text-gray-900">Conta</h3>
@@ -283,7 +275,6 @@ export function Profile({ onBack, isOwnProfile = true }: { onBack?: () => void; 
               </div>
             </div>
 
-            {/* Segurança */}
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
               <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
                 <h3 className="font-semibold text-gray-900">Segurança</h3>
@@ -304,7 +295,6 @@ export function Profile({ onBack, isOwnProfile = true }: { onBack?: () => void; 
               </div>
             </div>
 
-            {/* Pagamentos */}
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
               <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
                 <h3 className="font-semibold text-gray-900">Pagamentos</h3>
@@ -325,7 +315,6 @@ export function Profile({ onBack, isOwnProfile = true }: { onBack?: () => void; 
               </div>
             </div>
 
-            {/* Ajuda */}
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
               <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
                 <h3 className="font-semibold text-gray-900">Ajuda</h3>
@@ -361,9 +350,7 @@ export function Profile({ onBack, isOwnProfile = true }: { onBack?: () => void; 
 
   return (
     <div className="min-h-screen bg-gray-50 font-['Inter',sans-serif]">
-      {/* Header com foto de capa */}
       <div className="bg-white shadow-sm">
-        {/* Cover image */}
         <div
           className="h-32 md:h-48 relative"
           style={{ background: userData.coverImage }}
@@ -396,9 +383,7 @@ export function Profile({ onBack, isOwnProfile = true }: { onBack?: () => void; 
           )}
         </div>
 
-        {/* Profile info */}
         <div className="container mx-auto px-4 pb-6">
-          {/* Avatar */}
           <div className="relative -mt-16 mb-4 flex justify-center">
             <div className="relative">
               <div className="w-32 h-32 bg-[#2C3E50] rounded-full flex items-center justify-center text-white text-4xl font-bold border-4 border-white shadow-lg">
@@ -412,7 +397,6 @@ export function Profile({ onBack, isOwnProfile = true }: { onBack?: () => void; 
             </div>
           </div>
 
-          {/* Name and info */}
           <div className="text-center mb-6">
             <div className="flex items-center justify-center gap-2 mb-2">
               <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{userData.name}</h1>
@@ -422,13 +406,12 @@ export function Profile({ onBack, isOwnProfile = true }: { onBack?: () => void; 
             </div>
             {userData.verified && (
               <span className="inline-block bg-green-100 text-green-700 text-sm px-3 py-1 rounded-full mb-2">
-                ✓ Membro Verificado
+                Membro Verificado
               </span>
             )}
             <p className="text-gray-600">{userData.course}</p>
           </div>
 
-          {/* Stats bar */}
           <div className="grid grid-cols-3 gap-4 mb-6 max-w-2xl mx-auto">
             <div className="text-center p-4 bg-gray-50 rounded-lg">
               <div className="text-3xl font-bold text-[#2C3E50] mb-1">
@@ -458,7 +441,6 @@ export function Profile({ onBack, isOwnProfile = true }: { onBack?: () => void; 
             </div>
           </div>
 
-          {/* Tabs */}
           <div className="flex gap-2 md:gap-4 border-b border-gray-200 overflow-x-auto">
             <button
               onClick={() => setActiveTab('anuncios')}
@@ -498,23 +480,19 @@ export function Profile({ onBack, isOwnProfile = true }: { onBack?: () => void; 
                   : 'text-gray-500 hover:text-gray-700'
               }`}
             >
-              ⚙️ Configurações
+              Configurações
             </button>
           </div>
         </div>
       </div>
 
-      {/* Content */}
       <div className="container mx-auto px-4 py-6">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main content */}
           <div className="lg:col-span-2">
             {renderTabContent()}
           </div>
 
-          {/* Sidebar */}
           <div className="space-y-6">
-            {/* Sobre mim */}
             <div className="bg-white rounded-lg shadow-md p-6">
               <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
                 <Award className="w-5 h-5 text-[#2C3E50]" />
@@ -533,7 +511,6 @@ export function Profile({ onBack, isOwnProfile = true }: { onBack?: () => void; 
               </div>
             </div>
 
-            {/* Conquistas */}
             <div className="bg-white rounded-lg shadow-md p-6">
               <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
                 <Award className="w-5 h-5 text-[#2C3E50]" />
@@ -555,7 +532,6 @@ export function Profile({ onBack, isOwnProfile = true }: { onBack?: () => void; 
               </div>
             </div>
 
-            {/* Livros desejados */}
             <div className="bg-white rounded-lg shadow-md p-6">
               <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
                 <Heart className="w-5 h-5 text-[#2C3E50]" />

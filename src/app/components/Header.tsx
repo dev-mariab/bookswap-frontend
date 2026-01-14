@@ -26,12 +26,10 @@ export function Header({ onSearch }: HeaderProps) {
     <header className="bg-white shadow-sm sticky top-0 z-50">
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between gap-4">
-          {/* Logo */}
           <div className="flex items-center gap-2">
             <span className="text-2xl font-bold text-[#2C3E50]">BookSwap</span>
           </div>
 
-          {/* Search Bar */}
           <div className="flex-1 max-w-2xl hidden md:block">
             <form onSubmit={handleSearch} className="relative">
               <input
@@ -57,7 +55,6 @@ export function Header({ onSearch }: HeaderProps) {
             </form>
           </div>
 
-          {/* Actions */}
           <div className="flex items-center gap-4">
             <button 
               onClick={() => console.log('Vender Livro clicked')}
@@ -86,7 +83,6 @@ export function Header({ onSearch }: HeaderProps) {
           </div>
         </div>
 
-        {/* Mobile Search */}
         <div className="mt-3 md:hidden">
           <form onSubmit={handleSearch} className="relative">
             <input

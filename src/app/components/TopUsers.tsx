@@ -44,7 +44,6 @@ export function TopUsers() {
               key={user.id}
               className="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow p-4 flex items-center gap-4 cursor-pointer hover:transform hover:scale-[1.02] transition-all"
             >
-              {/* Posição */}
               <div className="flex-shrink-0">
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-white ${
@@ -59,17 +58,14 @@ export function TopUsers() {
                 </div>
               </div>
 
-              {/* Avatar */}
               <div className="w-16 h-16 bg-[#2C3E50] rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
                 {user.avatar}
               </div>
 
-              {/* Informações do usuário */}
               <div className="flex-1">
                 <h3 className="font-bold text-gray-900">{user.name}</h3>
                 <p className="text-sm text-gray-600">{user.course}</p>
                 
-                {/* Avaliação */}
                 <div className="flex gap-1 mt-1">
                   {[...Array(5)].map((_, i) => (
                     <Star
@@ -84,7 +80,6 @@ export function TopUsers() {
                 </div>
               </div>
 
-              {/* Número de transações */}
               <div className="text-right flex-shrink-0">
                 <div className="text-2xl font-bold text-[#27AE60]">
                   {user.transactions}
