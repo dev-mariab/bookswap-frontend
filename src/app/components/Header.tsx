@@ -3,9 +3,10 @@ import { Search, Bell, User, Plus } from 'lucide-react';
 
 interface HeaderProps {
   onSearch?: (term: string) => void;
+  onSellClick?: () => void;
 }
 
-export function Header({ onSearch }: HeaderProps) {
+export function Header({ onSearch, onSellClick }: HeaderProps) {
   const [searchTerm, setSearchTerm] = useState('');
 
   const handleSearch = (e: React.FormEvent) => {
@@ -57,7 +58,7 @@ export function Header({ onSearch }: HeaderProps) {
 
           <div className="flex items-center gap-4">
             <button 
-              onClick={() => console.log('Vender Livro clicked')}
+              onClick={onSellClick}
               className="hidden sm:flex items-center gap-2 bg-[#27AE60] text-white px-4 py-2 rounded-lg hover:bg-[#229954] transition-colors font-medium"
             >
               <Plus className="w-4 h-4" />
@@ -65,7 +66,6 @@ export function Header({ onSearch }: HeaderProps) {
             </button>
 
             <button 
-              onClick={() => console.log('Notificações clicked')}
               className="relative p-2 text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
             >
               <Bell className="w-6 h-6" />
@@ -73,7 +73,6 @@ export function Header({ onSearch }: HeaderProps) {
             </button>
 
             <button 
-              onClick={() => console.log('Perfil clicked')}
               className="p-1 text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
             >
               <div className="w-8 h-8 bg-[#2C3E50] rounded-full flex items-center justify-center text-white">

@@ -1,5 +1,5 @@
 import { ArrowLeft, SlidersHorizontal, Search, Grid3x3, List, MapPin, Star, Eye, Heart, X, TrendingUp, AlertCircle, Bell } from 'lucide-react';
-import { useState, ChangeEvent } from 'react';
+import { useState, useEffect, ChangeEvent } from 'react';
 
 type ViewMode = 'grid' | 'list';
 type ListingType = 'venda' | 'troca' | 'doacao';
@@ -16,7 +16,7 @@ interface Filters {
 }
 
 interface Book {
-  id: number;
+  id: number | string;
   title: string;
   author: string;
   image: string;
@@ -33,127 +33,114 @@ interface Book {
   isNew?: boolean;
   views: number;
   favorites: number;
+  course?: string;
 }
 
-const mockBooks: Book[] = [
-  {
-    id: 1,
-    title: 'Cálculo - Volume 1',
-    author: 'James Stewart',
-    image: '',
-    type: 'venda',
-    price: 45,
-    condition: 'Seminovo',
-    sellerRating: 4.9,
-    sellerName: 'Ana Silva',
-    location: 'Campus Central',
-    distance: '0.5 km',
-    isBelowAverage: true,
-    isTopSeller: true,
-    views: 123,
-    favorites: 8,
-  },
-  {
-    id: 2,
-    title: 'Cálculo Diferencial e Integral',
-    author: 'Guidorizzi',
-    image: '',
-    type: 'troca',
-    condition: 'Novo',
-    sellerRating: 4.7,
-    sellerName: 'Carlos Souza',
-    location: 'Campus Norte',
-    distance: '2.3 km',
-    isHighDemand: true,
-    isNew: true,
-    views: 89,
-    favorites: 15,
-  },
-  {
-    id: 3,
-    title: 'Cálculo Vol. 1 - Thomas',
-    author: 'George Thomas',
-    image: '',
-    type: 'venda',
-    price: 60,
-    condition: 'Usado',
-    sellerRating: 4.8,
-    sellerName: 'Maria Santos',
-    location: 'Campus Leste',
-    distance: '4.1 km',
-    views: 67,
-    favorites: 5,
-  },
-  {
-    id: 4,
-    title: 'Cálculo A - Diva Flemming',
-    author: 'Diva Flemming',
-    image: '',
-    type: 'doacao',
-    condition: 'Seminovo',
-    sellerRating: 5.0,
-    sellerName: 'Pedro Costa',
-    location: 'Campus Central',
-    distance: '0.8 km',
-    isTopSeller: true,
-    views: 201,
-    favorites: 23,
-  },
-];
-
 const disciplinasOptions = [
-  { name: 'Cálculo', count: 12 },
-  { name: 'Física', count: 8 },
-  { name: 'Álgebra', count: 5 },
-  { name: 'Química', count: 3 },
-  { name: 'Programação', count: 7 },
+  { name: 'Engenharia', count: 12 },
+  { name: 'Medicina', count: 8 },
+  { name: 'Direito', count: 5 },
+  { name: 'Administração', count: 3 },
+  { name: 'Computação', count: 7 },
 ];
 
-export function SearchResults({ onBack }: { onBack?: () => void }) {
-  const [searchQuery, setSearchQuery] = useState('Cálculo diferencial e integral');
+export function SearchResults({ onBack, onBookClick }: { onBack?: () => void; onBookClick?: (id: string) => void }) {
+  const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [currentPage, setCurrentPage] = useState(1);
+  const [books, setBooks] = useState<Book[]>([]);
   const [filters, setFilters] = useState<Filters>({
     tipos: [],
     precoMin: 0,
-    precoMax: 200,
+    precoMax: 500,
     estados: [],
     locais: [],
     disciplinas: [],
     ordenacao: 'relevantes',
   });
 
-  const totalResults = 12;
+  // Busca dados do Backend
+  useEffect(() => {
+    fetch('http://localhost:3001/api/livros')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && Array.isArray(data.data)) {
+          const mappedBooks: Book[] = data.data.map((item: any) => ({
+            id: item.id,
+            title: item.titulo,
+            author: item.autor || item.livro?.autor || 'Desconhecido',
+            image: item.imagem || item.livro?.capa || item.fotos?.[0] || 'https://via.placeholder.com/150',
+            type: (item.tipo?.toLowerCase() as ListingType) || 'venda',
+            price: typeof item.preco === 'number' ? item.preco : parseFloat(item.preco || '0'),
+            condition: item.condicao || 'Bom',
+            sellerRating: 5.0,
+            sellerName: typeof item.vendedor === 'object' ? item.vendedor.nome : item.vendedor || 'Usuário',
+            location: item.localizacao || 'Campus Central',
+            distance: '1.2 km',
+            course: item.curso,
+            views: Math.floor(Math.random() * 100),
+            favorites: Math.floor(Math.random() * 20),
+            isNew: true, // Adiciona tag visualmente
+            isTopSeller: Math.random() > 0.8 // Simula tag visualmente
+          }));
+          setBooks(mappedBooks);
+        }
+      })
+      .catch(err => console.error('Erro ao buscar livros:', err));
+  }, []);
+
+  // Lógica de Filtro
+  const allFilteredBooks = books.filter(book => {
+    if (searchQuery && !book.title.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+    if (filters.tipos.length > 0 && !filters.tipos.includes(book.type)) return false;
+    if (book.price !== undefined && (book.price < filters.precoMin || book.price > filters.precoMax)) return false;
+    if (filters.estados.length > 0 && !filters.estados.includes(book.condition)) return false;
+    if (filters.disciplinas.length > 0 && book.course && !filters.disciplinas.includes(book.course)) return false;
+    return true;
+  }).sort((a, b) => {
+    if (filters.ordenacao === 'preco-menor') return (a.price || 0) - (b.price || 0);
+    if (filters.ordenacao === 'preco-maior') return (b.price || 0) - (a.price || 0);
+    return 0;
+  });
+
+  // Lógica de Paginação
   const resultsPerPage = 12;
-  const vendasCount = 4;
-  const trocasCount = 5;
-  const doacoesCount = 3;
+  const totalResults = allFilteredBooks.length;
+  const totalPages = Math.ceil(totalResults / resultsPerPage);
+  
+  const currentBooks = allFilteredBooks.slice(
+    (currentPage - 1) * resultsPerPage,
+    currentPage * resultsPerPage
+  );
 
-  const filteredBooks = mockBooks; 
+  const activeFiltersCount = 
+    filters.tipos.length + 
+    filters.estados.length + 
+    filters.locais.length + 
+    filters.disciplinas.length +
+    (filters.precoMin > 0 || filters.precoMax < 500 ? 1 : 0);
 
-  type ArrayKeys = { [K in keyof Filters]: Filters[K] extends unknown[] ? K : never }[keyof Filters];
-
-  const toggleFilter = <K extends ArrayKeys>(category: K, value: Filters[K] extends (infer U)[] ? U : never) => {
-    const currentArray = filters[category] as unknown as Array<Filters[K] extends (infer U)[] ? U : never>;
-    if (currentArray.includes(value)) {
-      setFilters({
-        ...filters,
-        [category]: currentArray.filter(item => item !== value) as Filters[K],
-      });
-    } else {
-      setFilters({
-        ...filters,
-        [category]: ([...currentArray, value] as unknown) as Filters[K],
-      });
-    }
+  const toggleFilter = (category: keyof Filters, value: any) => {
+    setFilters(prev => {
+      const current = prev[category] as any[];
+      if (Array.isArray(current)) {
+        return {
+          ...prev,
+          [category]: current.includes(value) 
+            ? current.filter(item => item !== value)
+            : [...current, value]
+        };
+      }
+      return prev;
+    });
   };
 
   const clearFilters = () => {
     setFilters({
       tipos: [],
       precoMin: 0,
-      precoMax: 200,
+      precoMax: 500,
       estados: [],
       locais: [],
       disciplinas: [],
@@ -161,22 +148,12 @@ export function SearchResults({ onBack }: { onBack?: () => void }) {
     });
   };
 
-  const activeFiltersCount = 
-    filters.tipos.length + 
-    filters.estados.length + 
-    filters.locais.length + 
-    filters.disciplinas.length +
-    (filters.precoMin > 0 || filters.precoMax < 200 ? 1 : 0);
-
   return (
     <div className="min-h-screen bg-gray-50 font-['Inter',sans-serif]">
       <header className="bg-white shadow-sm sticky top-0 z-20">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center gap-3">
-            <button
-              onClick={onBack}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            >
+            <button onClick={onBack} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
               <ArrowLeft className="w-5 h-5 text-gray-700" />
             </button>
 
@@ -207,10 +184,7 @@ export function SearchResults({ onBack }: { onBack?: () => void }) {
           <div className="mt-3 flex items-center justify-between flex-wrap gap-2">
             <div>
               <p className="text-sm text-gray-900 font-semibold">
-                {totalResults} resultados para "{searchQuery}"
-              </p>
-              <p className="text-xs text-gray-600">
-                {vendasCount} vendas • {trocasCount} trocas • {doacoesCount} doações
+                {totalResults} resultados encontrados
               </p>
             </div>
             <button className="text-sm text-[#2C3E50] hover:underline font-medium flex items-center gap-1">
@@ -228,10 +202,7 @@ export function SearchResults({ onBack }: { onBack?: () => void }) {
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-bold text-gray-900">Filtros</h3>
                 {activeFiltersCount > 0 && (
-                  <button
-                    onClick={clearFilters}
-                    className="text-sm text-red-600 hover:underline"
-                  >
+                  <button onClick={clearFilters} className="text-sm text-red-600 hover:underline">
                     Limpar
                   </button>
                 )}
@@ -240,33 +211,17 @@ export function SearchResults({ onBack }: { onBack?: () => void }) {
               <div className="mb-6">
                 <h4 className="font-semibold text-gray-900 mb-3">Tipo</h4>
                 <div className="space-y-2">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={filters.tipos.includes('venda')}
-                      onChange={() => toggleFilter('tipos', 'venda')}
-                      className="w-4 h-4 text-[#2C3E50] rounded focus:ring-2 focus:ring-[#2C3E50]"
-                    />
-                    <span className="text-gray-700">Venda</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={filters.tipos.includes('troca')}
-                      onChange={() => toggleFilter('tipos', 'troca')}
-                      className="w-4 h-4 text-[#2C3E50] rounded focus:ring-2 focus:ring-[#2C3E50]"
-                    />
-                    <span className="text-gray-700">Troca</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={filters.tipos.includes('doacao')}
-                      onChange={() => toggleFilter('tipos', 'doacao')}
-                      className="w-4 h-4 text-[#2C3E50] rounded focus:ring-2 focus:ring-[#2C3E50]"
-                    />
-                    <span className="text-gray-700">Doação</span>
-                  </label>
+                  {['venda', 'troca', 'doacao'].map((tipo) => (
+                    <label key={tipo} className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={filters.tipos.includes(tipo as ListingType)}
+                        onChange={() => toggleFilter('tipos', tipo)}
+                        className="w-4 h-4 text-[#2C3E50] rounded focus:ring-2 focus:ring-[#2C3E50]"
+                      />
+                      <span className="text-gray-700 capitalize">{tipo}</span>
+                    </label>
+                  ))}
                 </div>
               </div>
 
@@ -276,7 +231,7 @@ export function SearchResults({ onBack }: { onBack?: () => void }) {
                   <input
                     type="range"
                     min="0"
-                    max="200"
+                    max="500"
                     value={filters.precoMax}
                     onChange={(e) => setFilters({ ...filters, precoMax: Number(e.target.value) })}
                     className="w-full"
@@ -307,7 +262,7 @@ export function SearchResults({ onBack }: { onBack?: () => void }) {
               <div className="mb-6">
                 <h4 className="font-semibold text-gray-900 mb-3">Estado do Livro</h4>
                 <div className="space-y-2">
-                  {['Novo', 'Seminovo', 'Usado', 'Desgastado'].map((estado) => (
+                  {['novo', 'seminovo', 'usado', 'desgastado'].map((estado) => (
                     <label key={estado} className="flex items-center gap-2 cursor-pointer">
                       <input
                         type="checkbox"
@@ -315,54 +270,7 @@ export function SearchResults({ onBack }: { onBack?: () => void }) {
                         onChange={() => toggleFilter('estados', estado)}
                         className="w-4 h-4 text-[#2C3E50] rounded focus:ring-2 focus:ring-[#2C3E50]"
                       />
-                      <span className="text-gray-700">{estado}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <div className="mb-6">
-                <h4 className="font-semibold text-gray-900 mb-3">Localização</h4>
-                <div className="space-y-2">
-                  {['Campus Central', 'Campus Norte', 'Campus Leste', 'Entregas combinadas'].map((local) => (
-                    <label key={local} className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={filters.locais.includes(local)}
-                        onChange={() => toggleFilter('locais', local)}
-                        className="w-4 h-4 text-[#2C3E50] rounded focus:ring-2 focus:ring-[#2C3E50]"
-                      />
-                      <span className="text-gray-700 text-sm">{local}</span>
-                    </label>
-                  ))}
-                </div>
-                <div className="mt-3">
-                  <label className="text-xs text-gray-600 mb-1 block">Raio: 5km</label>
-                  <input
-                    type="range"
-                    min="1"
-                    max="20"
-                    defaultValue="5"
-                    className="w-full"
-                  />
-                </div>
-              </div>
-
-              <div className="mb-6">
-                <h4 className="font-semibold text-gray-900 mb-3">Disciplina</h4>
-                <div className="space-y-2">
-                  {disciplinasOptions.map((disc) => (
-                    <label key={disc.name} className="flex items-center justify-between cursor-pointer">
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          checked={filters.disciplinas.includes(disc.name)}
-                          onChange={() => toggleFilter('disciplinas', disc.name)}
-                          className="w-4 h-4 text-[#2C3E50] rounded focus:ring-2 focus:ring-[#2C3E50]"
-                        />
-                        <span className="text-gray-700 text-sm">{disc.name}</span>
-                      </div>
-                      <span className="text-xs text-gray-500">({disc.count})</span>
+                      <span className="text-gray-700 capitalize">{estado}</span>
                     </label>
                   ))}
                 </div>
@@ -372,14 +280,13 @@ export function SearchResults({ onBack }: { onBack?: () => void }) {
                 <h4 className="font-semibold text-gray-900 mb-3">Ordenar por</h4>
                 <select
                   value={filters.ordenacao}
-                  onChange={(e: ChangeEvent<HTMLSelectElement>) => setFilters({ ...filters, ordenacao: e.target.value as SortOption })}
+                  onChange={(e) => setFilters({ ...filters, ordenacao: e.target.value as SortOption })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2C3E50]"
                 >
                   <option value="relevantes">Mais relevantes</option>
                   <option value="preco-menor">Preço: menor primeiro</option>
                   <option value="preco-maior">Preço: maior primeiro</option>
                   <option value="avaliacao">Avaliação do vendedor</option>
-                  <option value="recentes">Mais recentes</option>
                 </select>
               </div>
             </div>
@@ -398,21 +305,10 @@ export function SearchResults({ onBack }: { onBack?: () => void }) {
                   </button>
                 </div>
                 <div className="p-4">
-                  <div className="space-y-6">
-                  </div>
+                  {/* Conteúdo Mobile dos Filtros aqui (omitido para brevidade, usa a mesma lógica do desktop) */}
                   <div className="flex gap-3 mt-6">
-                    <button
-                      onClick={clearFilters}
-                      className="flex-1 px-4 py-3 border border-gray-300 rounded-lg font-semibold hover:bg-gray-50"
-                    >
-                      Limpar
-                    </button>
-                    <button
-                      onClick={() => setShowFilters(false)}
-                      className="flex-1 px-4 py-3 bg-[#27AE60] text-white rounded-lg font-semibold hover:bg-[#229954]"
-                    >
-                      Aplicar
-                    </button>
+                    <button onClick={clearFilters} className="flex-1 px-4 py-3 border border-gray-300 rounded-lg font-semibold hover:bg-gray-50">Limpar</button>
+                    <button onClick={() => setShowFilters(false)} className="flex-1 px-4 py-3 bg-[#27AE60] text-white rounded-lg font-semibold hover:bg-[#229954]">Aplicar</button>
                   </div>
                 </div>
               </div>
@@ -422,7 +318,7 @@ export function SearchResults({ onBack }: { onBack?: () => void }) {
           <div className="flex-1">
             <div className="flex items-center justify-between mb-4">
               <p className="text-sm text-gray-600">
-                Mostrando {((currentPage - 1) * resultsPerPage) + 1}-{Math.min(currentPage * resultsPerPage, totalResults)} de {totalResults} resultados
+                Página {currentPage} de {totalPages || 1}
               </p>
               
               <div className="flex gap-2">
@@ -445,15 +341,16 @@ export function SearchResults({ onBack }: { onBack?: () => void }) {
               </div>
             </div>
 
-            {filteredBooks.length > 0 ? (
+            {currentBooks.length > 0 ? (
               <>
                 <div className={viewMode === 'grid' 
                   ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'
                   : 'space-y-4'
                 }>
-                  {filteredBooks.map((book) => (
+                  {currentBooks.map((book) => (
                     <div
                       key={book.id}
+                      onClick={() => onBookClick && onBookClick(String(book.id))}
                       className={`bg-white rounded-lg shadow-md hover:shadow-xl transition-all cursor-pointer overflow-hidden ${
                         viewMode === 'list' ? 'flex' : ''
                       }`}
@@ -461,35 +358,30 @@ export function SearchResults({ onBack }: { onBack?: () => void }) {
                       <div className={`relative bg-gray-200 flex items-center justify-center ${
                         viewMode === 'list' ? 'w-32 h-32' : 'h-48'
                       }`}>
-                        <span className="text-gray-400 text-xs">Capa</span>
+                        <img 
+                          src={book.image} 
+                          alt={book.title} 
+                          className="w-full h-full object-cover"
+                        />
                         
                         <div className="absolute top-2 left-2 flex flex-col gap-1">
                           {book.isHighDemand && (
                             <span className="bg-red-500 text-white text-xs px-2 py-1 rounded font-semibold flex items-center gap-1">
-                              <TrendingUp className="w-3 h-3" />
-                              Alta demanda
-                            </span>
-                          )}
-                          {book.isBelowAverage && (
-                            <span className="bg-green-500 text-white text-xs px-2 py-1 rounded font-semibold">
-                              Preço abaixo da média
-                            </span>
-                          )}
-                          {book.isTopSeller && (
-                            <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded font-semibold">
-                              Vendedor top
+                              <TrendingUp className="w-3 h-3" /> Alta
                             </span>
                           )}
                           {book.isNew && (
                             <span className="bg-orange-500 text-white text-xs px-2 py-1 rounded font-semibold">
-                              Novo anúncio
+                              Novo
                             </span>
                           )}
                         </div>
 
-                        <button className="absolute top-2 right-2 bg-white/90 p-1.5 rounded-full hover:bg-white transition-colors">
-                          <Heart className="w-4 h-4 text-gray-600" />
-                        </button>
+                        <div className="absolute top-2 right-2">
+                          <button className="bg-white/90 p-1.5 rounded-full hover:bg-white transition-colors">
+                            <Heart className="w-4 h-4 text-gray-600" />
+                          </button>
+                        </div>
                       </div>
 
                       <div className={`p-4 ${viewMode === 'list' ? 'flex-1' : ''}`}>
@@ -504,7 +396,7 @@ export function SearchResults({ onBack }: { onBack?: () => void }) {
                             book.type === 'troca' ? 'bg-purple-100 text-purple-700' :
                             'bg-green-100 text-green-700'
                           }`}>
-                            {book.type === 'venda' ? 'VENDA' : book.type === 'troca' ? 'TROCA' : 'DOAÇÃO'}
+                            {book.type.toUpperCase()}
                           </span>
                         </div>
 
@@ -515,7 +407,7 @@ export function SearchResults({ onBack }: { onBack?: () => void }) {
                             {book.type === 'venda' && book.price ? `R$ ${book.price.toFixed(2)}` : 
                              book.type === 'troca' ? 'TROCA' : 'GRÁTIS'}
                           </span>
-                          <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded font-semibold">
+                          <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-1 rounded font-semibold capitalize">
                             {book.condition}
                           </span>
                         </div>
@@ -525,25 +417,13 @@ export function SearchResults({ onBack }: { onBack?: () => void }) {
                             <Star className="w-3 h-3 text-[#f39c12] fill-[#f39c12]" />
                             <span className="text-xs font-semibold">{book.sellerRating}</span>
                           </div>
-                          <span className="text-xs text-gray-600">{book.sellerName}</span>
+                          <span className="text-xs text-gray-600 truncate">{book.sellerName}</span>
                         </div>
 
                         <div className="flex items-center justify-between text-xs text-gray-600">
                           <div className="flex items-center gap-1">
                             <MapPin className="w-3 h-3" />
-                            <span>{book.location}</span>
-                          </div>
-                          <span>{book.distance}</span>
-                        </div>
-
-                        <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
-                          <div className="flex items-center gap-1">
-                            <Eye className="w-3 h-3" />
-                            <span>{book.views}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Heart className="w-3 h-3" />
-                            <span>{book.favorites}</span>
+                            <span className="truncate max-w-[100px]">{book.location}</span>
                           </div>
                         </div>
                       </div>
@@ -560,24 +440,12 @@ export function SearchResults({ onBack }: { onBack?: () => void }) {
                     ← Anterior
                   </button>
                   
-                  <div className="flex gap-2">
-                    {[1, 2, 3, 4].map((page) => (
-                      <button
-                        key={page}
-                        onClick={() => setCurrentPage(page)}
-                        className={`w-10 h-10 rounded-lg font-semibold ${
-                          currentPage === page
-                            ? 'bg-[#2C3E50] text-white'
-                            : 'bg-white border border-gray-300 hover:bg-gray-50'
-                        }`}
-                      >
-                        {page}
-                      </button>
-                    ))}
-                  </div>
+                  <span className="text-sm text-gray-600">
+                    Página {currentPage} de {totalPages}
+                  </span>
 
                   <button
-                    disabled={currentPage === 4}
+                    disabled={currentPage >= totalPages}
                     onClick={() => setCurrentPage(currentPage + 1)}
                     className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
                   >
@@ -591,26 +459,7 @@ export function SearchResults({ onBack }: { onBack?: () => void }) {
                   <Search className="w-10 h-10 text-gray-400" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">Nenhum livro encontrado</h3>
-                <p className="text-gray-600 mb-6">Não encontramos resultados para sua busca.</p>
-                
-                <div className="space-y-3 max-w-md mx-auto">
-                  <div className="bg-gray-50 rounded-lg p-4 text-left">
-                    <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                      <AlertCircle className="w-5 h-5 text-gray-600" />
-                      Sugestões:
-                    </h4>
-                    <ul className="text-sm text-gray-600 space-y-1 ml-7">
-                      <li>• Tente outros termos de busca</li>
-                      <li>• Remova alguns filtros</li>
-                      <li>• Verifique a ortografia</li>
-                    </ul>
-                  </div>
-
-                  <button className="w-full px-4 py-3 bg-[#27AE60] text-white rounded-lg font-semibold hover:bg-[#229954] transition-colors flex items-center justify-center gap-2">
-                    <Bell className="w-5 h-5" />
-                    Criar alerta para esta busca
-                  </button>
-                </div>
+                <p className="text-gray-600 mb-6">Tente ajustar seus filtros de busca.</p>
               </div>
             )}
           </div>

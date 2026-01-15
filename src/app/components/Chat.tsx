@@ -1,5 +1,6 @@
 import { ArrowLeft, MoreVertical, Send, Paperclip, Smile, Shield, Check, AlertCircle, X } from 'lucide-react';
 import React, { useState, useRef, useEffect, ChangeEvent } from 'react';
+import { Livro } from '../types';
 
 interface Message {
   id: number;
@@ -20,78 +21,53 @@ const initialMessages: Message[] = [
   {
     id: 1,
     sender: 'other',
-    text: 'Olá! Tenho interesse no livro de Cálculo',
+    text: 'Olá! Tenho interesse no livro',
     timestamp: 'Ontem, 14:30',
     status: 'read',
   },
   {
     id: 2,
     sender: 'user',
-    text: 'Olá Ana! Sim, ainda está disponível',
+    text: 'Olá! Sim, ainda está disponível',
     timestamp: 'Ontem, 14:32',
     status: 'read',
   },
   {
     id: 3,
     sender: 'other',
-    text: 'Poderia fazer por R$ 40?',
+    text: 'Poderia negociar o valor?',
     timestamp: 'Hoje, 10:15',
     status: 'read',
-  },
-  {
-    id: 4,
-    sender: 'system',
-    text: 'Ana fez uma oferta de R$ 40,00',
-    timestamp: 'Hoje, 10:15',
-    type: 'offer',
-    offerAmount: 40,
-  },
-  {
-    id: 5,
-    sender: 'user',
-    text: 'Aceito R$ 45, é o mínimo',
-    timestamp: 'Hoje, 10:20',
-    status: 'read',
-  },
-  {
-    id: 6,
-    sender: 'other',
-    text: 'Combinado!',
-    timestamp: 'Hoje, 10:22',
-    status: 'read',
-  },
-  {
-    id: 7,
-    sender: 'system',
-    text: 'Vocês combinaram R$ 45,00',
-    timestamp: 'Hoje, 10:22',
-    type: 'accepted',
-  },
-  {
-    id: 8,
-    sender: 'system',
-    text: 'Encontre-se em locais públicos do campus',
-    timestamp: 'Hoje, 10:22',
-    type: 'safety',
   },
 ];
-
-import { Livro } from '../types';
 
 interface ChatProps {
   onBack?: () => void;
   book?: Livro;
 }
 
-export function Chat({ onBack }: ChatProps) {
+export function Chat({ onBack, book }: ChatProps) {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
-  const [showMeetingProposal, setShowMeetingProposal] = useState(true);
+  const [showMeetingProposal, setShowMeetingProposal] = useState(false);
   const [attachedImage, setAttachedImage] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const vendedorNome = book?.vendedor 
+    ? (typeof book.vendedor === 'object' ? book.vendedor.nome : book.vendedor)
+    : 'Vendedor';
+    
+  const vendedorIniciais = vendedorNome
+    .split(' ')
+    .map((n: string) => n[0])
+    .join('')
+    .substring(0, 2)
+    .toUpperCase();
+
+  const livroImagem = (book as any)?.imagem || book?.livro?.capa || book?.fotos?.[0] || null;
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -155,7 +131,7 @@ export function Chat({ onBack }: ChatProps) {
     const newMessage: Message = {
       id: messages.length + 1,
       sender: 'user',
-      text: 'Gostaria de fazer uma oferta de R$ 42,00',
+      text: `Gostaria de fazer uma oferta de R$ ${(book?.preco || 0).toFixed(2)}`,
       timestamp: 'Agora',
       status: 'sent',
     };
@@ -190,12 +166,12 @@ export function Chat({ onBack }: ChatProps) {
           </button>
           
           <div className="w-10 h-10 bg-[#2C3E50] rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
-            AS
+            {vendedorIniciais}
           </div>
           
           <div className="flex-1 min-w-0">
-            <h2 className="font-bold text-gray-900 truncate">Ana Silva</h2>
-            <p className="text-xs text-gray-600 truncate">⭐ 4.9 • 15 transações • Online há 2min</p>
+            <h2 className="font-bold text-gray-900 truncate">{vendedorNome}</h2>
+            <p className="text-xs text-gray-600 truncate">Online há 2min</p>
           </div>
         </div>
 
@@ -225,14 +201,20 @@ export function Chat({ onBack }: ChatProps) {
 
       <div className="bg-white border-b border-gray-200 px-4 py-3">
         <div className="flex items-center gap-3 bg-blue-50 rounded-lg p-3">
-          <div className="w-16 h-20 bg-gray-200 rounded flex-shrink-0 flex items-center justify-center">
-            <span className="text-xs text-gray-400">Capa</span>
+          <div className="w-16 h-20 bg-gray-200 rounded flex-shrink-0 flex items-center justify-center overflow-hidden">
+            {livroImagem ? (
+                <img src={livroImagem} alt="Capa" className="w-full h-full object-cover" />
+            ) : (
+                <span className="text-xs text-gray-400">Capa</span>
+            )}
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-xs text-gray-600 mb-1">Negociando:</p>
-            <h3 className="font-bold text-gray-900 truncate">Cálculo Vol. 1</h3>
-            <p className="text-sm text-[#27AE60] font-semibold">Preço: R$ 45,00</p>
-            <p className="text-xs text-gray-600">Estado: Seminovo</p>
+            <h3 className="font-bold text-gray-900 truncate">{book?.titulo || 'Livro Selecionado'}</h3>
+            <p className="text-sm text-[#27AE60] font-semibold">
+                Preço: R$ {book?.preco?.toFixed(2) || '0.00'}
+            </p>
+            <p className="text-xs text-gray-600">Estado: {book?.condicao || 'N/A'}</p>
           </div>
           <button className="px-3 py-1.5 bg-[#2C3E50] text-white text-xs rounded-lg hover:bg-[#34495e] transition-colors flex-shrink-0">
             Ver anúncio

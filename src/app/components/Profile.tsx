@@ -57,12 +57,12 @@ const reviews = [
 ];
 
 const achievements = [
-  { id: 1, icon: '', title: 'Vendedor do Mês', description: 'Maior número de vendas em Março' },
-  { id: 2, icon: '', title: '10 Trocas Concluídas', description: 'Completou 10 trocas com sucesso' },
-  { id: 3, icon: '', title: 'Resposta Rápida', description: 'Responde em menos de 1h' },
-  { id: 4, icon: '', title: '5 Avaliações 5-estrelas', description: 'Recebeu 5 avaliações perfeitas' },
-  { id: 5, icon: '', title: 'Top 3 Reputação', description: 'Entre os 3 melhores do mês' },
-  { id: 6, icon: '', title: 'Membro Verificado', description: 'Perfil verificado pela plataforma' },
+  { id: 1, icon: '🏆', title: 'Vendedor do Mês', description: 'Maior número de vendas em Março' },
+  { id: 2, icon: '🔄', title: '10 Trocas Concluídas', description: 'Completou 10 trocas com sucesso' },
+  { id: 3, icon: '⚡', title: 'Resposta Rápida', description: 'Responde em menos de 1h' },
+  { id: 4, icon: '⭐', title: '5 Avaliações 5-estrelas', description: 'Recebeu 5 avaliações perfeitas' },
+  { id: 5, icon: '🏅', title: 'Top 3 Reputação', description: 'Entre os 3 melhores do mês' },
+  { id: 6, icon: '🛡️', title: 'Membro Verificado', description: 'Perfil verificado pela plataforma' },
 ];
 
 const wishlist = [

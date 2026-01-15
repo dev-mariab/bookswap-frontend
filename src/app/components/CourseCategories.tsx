@@ -1,5 +1,9 @@
 import { Settings, Heart, Scale, BarChart3 } from 'lucide-react';
 
+interface CourseCategoriesProps {
+  onSelectCategory: (category: string) => void;
+}
+
 const courses = [
   {
     id: 1,
@@ -31,7 +35,7 @@ const courses = [
   },
 ];
 
-export function CourseCategories() {
+export function CourseCategories({ onSelectCategory }: CourseCategoriesProps) {
   return (
     <section className="py-12 bg-white">
       <div className="container mx-auto px-4">
@@ -45,6 +49,7 @@ export function CourseCategories() {
             return (
               <button
                 key={course.id}
+                onClick={() => onSelectCategory(course.name)}
                 className={`${course.color} ${course.hoverColor} text-white p-6 rounded-lg shadow-md transition-all transform hover:scale-105 flex flex-col items-center gap-3`}
               >
                 <Icon className="w-12 h-12" />

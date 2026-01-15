@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Livro } from '../app/types';
+import { Livro } from '../app/types'; // Caminho corrigido conforme sua imagem
 
 interface SearchStrategy {
   search(books: Livro[], term: string): Livro[];
@@ -15,17 +15,20 @@ class TitleSearchStrategy implements SearchStrategy {
 
 class AuthorSearchStrategy implements SearchStrategy {
   search(books: Livro[], term: string): Livro[] {
-    return books.filter(book => 
-      book.livro?.autor?.toLowerCase().includes(term.toLowerCase())
-    );
+    return books.filter(book => {
+      const autor = book.autor || book.livro?.autor || '';
+      return autor.toLowerCase().includes(term.toLowerCase());
+    });
   }
 }
 
 class CourseSearchStrategy implements SearchStrategy {
   search(books: Livro[], term: string): Livro[] {
-    return books.filter(book => 
-      book.vendedor?.curso?.toLowerCase().includes(term.toLowerCase())
-    );
+    return books.filter(book => {
+      const cursoVendedor = typeof book.vendedor === 'object' ? book.vendedor.curso : '';
+      const curso = book.curso || cursoVendedor || '';
+      return curso.toLowerCase().includes(term.toLowerCase());
+    });
   }
 }
 
@@ -33,11 +36,17 @@ class AllSearchStrategy implements SearchStrategy {
   search(books: Livro[], term: string): Livro[] {
     return books.filter(book => {
       const termLower = term.toLowerCase();
+      
+      const autor = book.autor || book.livro?.autor || '';
+      const cursoVendedor = typeof book.vendedor === 'object' ? book.vendedor.curso : '';
+      const curso = book.curso || cursoVendedor || '';
+      const descricao = book.descricao || '';
+
       return (
         book.titulo.toLowerCase().includes(termLower) ||
-        book.livro?.autor?.toLowerCase().includes(termLower) ||
-        book.vendedor?.curso?.toLowerCase().includes(termLower) ||
-        book.descricao?.toLowerCase().includes(termLower)
+        autor.toLowerCase().includes(termLower) ||
+        curso.toLowerCase().includes(termLower) ||
+        descricao.toLowerCase().includes(termLower)
       );
     });
   }
@@ -65,8 +74,9 @@ export function useSearchStrategy(books: Livro[]) {
   return {
     searchResults,
     searchStrategy,
-    searchTerm,
-    setSearchTerm,
-    setSearchType
+    searchType,
+    setSearchType,
+    executeSearch: setSearchTerm,
+    setSearchTerm
   };
 }

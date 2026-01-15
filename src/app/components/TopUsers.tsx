@@ -1,5 +1,10 @@
 import { Star, Award } from 'lucide-react';
 
+// Adicionei uma interface para permitir cliques no futuro
+interface TopUsersProps {
+  onUserClick?: (userId: number) => void;
+}
+
 const topUsers = [
   {
     id: 1,
@@ -27,7 +32,7 @@ const topUsers = [
   },
 ];
 
-export function TopUsers() {
+export function TopUsers({ onUserClick }: TopUsersProps) {
   return (
     <section className="py-12 bg-gray-50">
       <div className="container mx-auto px-4">
@@ -42,6 +47,7 @@ export function TopUsers() {
           {topUsers.map((user, index) => (
             <div
               key={user.id}
+              onClick={() => onUserClick?.(user.id)}
               className="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow p-4 flex items-center gap-4 cursor-pointer hover:transform hover:scale-[1.02] transition-all"
             >
               <div className="flex-shrink-0">

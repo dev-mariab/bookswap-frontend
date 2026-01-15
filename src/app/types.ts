@@ -1,11 +1,18 @@
 export interface Livro {
-  id: string;
+  id: string | number;
   titulo: string;
   descricao?: string;
   preco: number;
   condicao: string;
   tipo?: string;
-  vendedor?: {
+  autor?: string;
+  imagem?: string;
+  curso?: string;
+  avaliacao?: number;
+  localizacao?: string;
+  userId?: string;
+  createdAt?: string;
+  vendedor?: string | {
     nome: string;
     avaliacao: number;
     curso?: string;
