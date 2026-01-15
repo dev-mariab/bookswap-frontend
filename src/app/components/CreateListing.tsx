@@ -195,61 +195,61 @@ export function CreateListing({ onBack, onSuccess }: { onBack?: () => void; onSu
   };
 
   const handlePublish = async () => {
-  if (!validateStep()) return;
-  
-  setIsPublishing(true);
-  
-  try {
-    const livroData = {
-      titulo: data.bookInfo.title,
-      autor: data.bookInfo.author,
-      preco: data.listingType === 'venda' ? parseFloat(data.price) : 0,
-      condicao: data.condition,
-      descricao: data.description,
-      curso: data.bookInfo.course,
-      tipo: data.listingType,
-      imagem: data.photos.length > 0 ? data.photos[0] : 'https://via.placeholder.com/150',
-      vendedor: 'Usuário Atual', 
-      avaliacao: 5.0, 
-      localizacao: data.locations.length > 0 ? data.locations[0] : 'Campus Central'
-    };
+    if (!validateStep()) return;
     
-    console.log('Enviando dados:', livroData);
+    setIsPublishing(true);
+    
+    try {
+      const livroData = {
+        titulo: data.bookInfo.title,
+        autor: data.bookInfo.author,
+        preco: data.listingType === 'venda' ? parseFloat(data.price.replace(',', '.')) : 0,
+        condicao: data.condition,
+        descricao: data.description,
+        curso: data.bookInfo.course,
+        listingType: data.listingType,
+        imagem: data.photos.length > 0 ? data.photos[0] : 'https://via.placeholder.com/150',
+        vendedor: 'Usuário Atual', 
+        avaliacao: 5.0, 
+        localizacao: data.locations.length > 0 ? data.locations[0] : 'Campus Central',
+        userId: 'user-123'
+      };
+      
+      console.log('Enviando dados para o backend:', livroData);
 
-    const response = await fetch('http://localhost:3001/api/livros', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(livroData),
-    });
-    
-    if (response.ok) {
-      const result = await response.json();
-      console.log('Resposta do backend:', result);
+      const response = await fetch('http://localhost:3001/api/livros', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(livroData),
+      });
       
-      const bookSubject = BookObserverManager.getInstance();
-      bookSubject.notify(result.data || livroData);
+      if (response.ok) {
+        const result = await response.json();
+        
+        const bookSubject = BookObserverManager.getInstance();
+        bookSubject.notify(result.data || livroData);
+        
+        setShowSuccess(true);
+        
+        setTimeout(() => {
+          onSuccess?.();
+        }, 2000);
+        
+      } else {
+        const errorData = await response.json();
+        console.error('Erro retornado pelo backend:', errorData);
+        alert(`Erro ao publicar: ${errorData.error || 'Falha no servidor'}`);
+      }
       
-      setShowSuccess(true);
-      
-      setTimeout(() => {
-        onSuccess?.();
-      }, 2000);
-      
-    } else {
-      const errorData = await response.json();
-      console.error('Erro do backend:', errorData);
-      alert(`Erro ao publicar: ${errorData.error || 'Falha no servidor'}`);
+    } catch (error) {
+      console.error('Erro de conexão:', error);
+      alert('Erro de conexão com o servidor. Verifique se o backend está rodando.');
+    } finally {
+      setIsPublishing(false);
     }
-    
-  } catch (error) {
-    console.error('Erro de conexão:', error);
-    alert('Erro de conexão com o servidor. Verifique se o backend está rodando.');
-  } finally {
-    setIsPublishing(false);
-  }
-};
+  };
 
   const handleLocationToggle = (location: string) => {
     if (data.locations.includes(location)) {
@@ -805,21 +805,30 @@ export function CreateListing({ onBack, onSuccess }: { onBack?: () => void; onSu
             <div className="mt-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
               <h3 className="font-semibold text-gray-900 mb-3">Preview do Anúncio</h3>
               <div className="bg-white rounded-lg shadow-md overflow-hidden">
-                {data.photos[0] && (
-                  <img src={data.photos[0]} alt="Preview" className="w-full h-48 object-cover" />
-                )}
-                <div className="p-4">
-                  <h4 className="font-bold text-gray-900 mb-2">{data.bookInfo.title || 'Título do livro'}</h4>
-                  <p className="text-sm text-gray-600 mb-2">{data.bookInfo.author || 'Autor'}</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-[#27AE60] font-bold">
-                      {data.listingType === 'venda' && `R$ ${data.price || '0,00'}`}
-                      {data.listingType === 'troca' && 'TROCA'}
-                      {data.listingType === 'doacao' && 'DOAÇÃO'}
-                    </span>
-                    <span className="bg-yellow-100 text-yellow-700 text-xs px-2 py-1 rounded font-semibold uppercase">
-                      {data.condition || 'Condição'}
-                    </span>
+                <div className="flex gap-4 p-4">
+                  <div className="w-24 h-32 flex-shrink-0 bg-gray-200 rounded-md overflow-hidden">
+                    {data.photos[0] ? (
+                      <img src={data.photos[0]} alt="Capa" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-400">
+                        <Camera className="w-8 h-8" />
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="flex-1">
+                    <h4 className="font-bold text-gray-900 mb-1">{data.bookInfo.title || 'Título do livro'}</h4>
+                    <p className="text-sm text-gray-600 mb-2">{data.bookInfo.author || 'Autor'}</p>
+                    <div className="flex items-center justify-between mt-2">
+                      <span className="text-[#27AE60] font-bold">
+                        {data.listingType === 'venda' && `R$ ${data.price || '0,00'}`}
+                        {data.listingType === 'troca' && 'TROCA'}
+                        {data.listingType === 'doacao' && 'DOAÇÃO'}
+                      </span>
+                      <span className="bg-yellow-100 text-yellow-700 text-xs px-2 py-1 rounded font-semibold uppercase">
+                        {conditionOptions.find(c => c.id === data.condition)?.label || 'Condição'}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>

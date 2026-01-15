@@ -23,6 +23,10 @@ export function BookDetails({ book, onBack, onOpenChat }: BookDetailsProps) {
     );
   }
 
+  const vendedorNome = typeof book.vendedor === 'object' ? book.vendedor.nome : book.vendedor || 'Vendedor';
+  const vendedorCurso = typeof book.vendedor === 'object' ? book.vendedor.curso : book.curso || 'Universitário';
+  const vendedorAvaliacao = typeof book.vendedor === 'object' ? book.vendedor.avaliacao : book.avaliacao || 5.0;
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white shadow-sm border-b">
@@ -41,7 +45,7 @@ export function BookDetails({ book, onBack, onOpenChat }: BookDetailsProps) {
           <div>
             <div className="bg-white rounded-xl shadow-lg overflow-hidden">
               <img 
-                src={book.livro?.capa || book.fotos?.[0] || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600'} 
+                src={(book as any).imagem || book.livro?.capa || book.fotos?.[0] || 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600'} 
                 alt={book.titulo}
                 className="w-full h-96 object-cover"
               />
@@ -68,12 +72,12 @@ export function BookDetails({ book, onBack, onOpenChat }: BookDetailsProps) {
               </h1>
               
               <p className="text-gray-600 mb-4">
-                por {book.livro?.autor || 'Autor desconhecido'}
+                por {book.autor || book.livro?.autor || 'Autor desconhecido'}
               </p>
               
               <div className="mb-6">
                 <span className="text-4xl font-bold text-blue-600">
-                  R$ {book.preco.toFixed(2)}
+                  R$ {book.preco?.toFixed(2) || '0.00'}
                 </span>
                 {book.tipo !== 'venda' && (
                   <span className="ml-3 px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
@@ -101,24 +105,22 @@ export function BookDetails({ book, onBack, onOpenChat }: BookDetailsProps) {
                 </div>
               )}
               
-              {book.vendedor && (
-                <div className="border-t border-gray-200 pt-6 mb-6">
-                  <h3 className="font-semibold text-gray-700 mb-3">Sobre o vendedor:</h3>
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                      <span className="text-blue-600 font-bold text-lg">
-                        {book.vendedor.nome.charAt(0)}
-                      </span>
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-900">{book.vendedor.nome}</p>
-                      <p className="text-gray-600 text-sm">
-                        {book.vendedor.curso || 'Estudante'} • ⭐ {book.vendedor.avaliacao.toFixed(1)}
-                      </p>
-                    </div>
+              <div className="border-t border-gray-200 pt-6 mb-6">
+                <h3 className="font-semibold text-gray-700 mb-3">Sobre o vendedor:</h3>
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                    <span className="text-blue-600 font-bold text-lg">
+                      {vendedorNome.charAt(0)}
+                    </span>
+                  </div>
+                  <div>
+                    <p className="font-medium text-gray-900">{vendedorNome}</p>
+                    <p className="text-gray-600 text-sm">
+                      {vendedorCurso} • ⭐ {typeof vendedorAvaliacao === 'number' ? vendedorAvaliacao.toFixed(1) : '5.0'}
+                    </p>
                   </div>
                 </div>
-              )}
+              </div>
               
               <div className="flex gap-4">
                 <button 
